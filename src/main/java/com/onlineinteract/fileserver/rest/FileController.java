@@ -41,10 +41,12 @@ public class FileController {
 			for (int i = 0; i < noOfChunks; i++) {
 				byte[] outputByte;
 				if (i == (noOfChunks - 1)) {
+					logger.info("Writing last chunk...");
 					outputByte = new byte[(int) lastChunkSize];
 					fileIn.read(outputByte, 0, (int) lastChunkSize);
 					out.write(outputByte, 0, (int) lastChunkSize);
 				} else {
+					logger.info("Writing chunk " + (i + 1) + "...");
 					outputByte = new byte[CHUNK];
 					fileIn.read(outputByte, 0, CHUNK);
 					out.write(outputByte, 0, CHUNK);
@@ -58,6 +60,7 @@ public class FileController {
 			}
 		}
 
+		logger.info("File: " + fileName +  " has been successfully sent over the wire");
 		fileIn.close();
 		out.close();
 	}
