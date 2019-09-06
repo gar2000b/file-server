@@ -37,7 +37,7 @@ public class FileController {
 		if (file.length() > CHUNK) {
 			long noOfChunks = (file.length() / CHUNK) + 1;
 			long lastChunkSize = file.length() - (CHUNK * (noOfChunks - 1));
-			logger.info("File" + fileName + " is greater then 2Gb and has " + noOfChunks + " no of chunks with the last chunk size of " + lastChunkSize + ", Fetching...");
+			logger.info("File: " + fileName + " is greater then 2Gb and has " + noOfChunks + " no of chunks with the last chunk size of " + lastChunkSize + ", Fetching...");
 			for (int i = 0; i < noOfChunks; i++) {
 				byte[] outputByte;
 				if (i == (noOfChunks - 1)) {
@@ -51,7 +51,7 @@ public class FileController {
 				}
 			}
 		} else {
-			logger.info("File" + fileName + " is less then 2Gb. Fetching...");
+			logger.info("File: " + fileName + " is less then 2Gb. Fetching...");
 			byte[] outputByte = new byte[(int) file.length()];
 			while (fileIn.read(outputByte, 0, (int) file.length()) != -1) {
 				out.write(outputByte, 0, (int) file.length());
