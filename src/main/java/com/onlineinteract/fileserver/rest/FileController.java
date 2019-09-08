@@ -47,7 +47,12 @@ public class FileController {
 				out.write(outputByte, 0, MINI_CHUNK);
 				outputByte = new byte[MINI_CHUNK];
 				bytesProcessed += MINI_CHUNK;
-				logger.info("Processed: " + bytesProcessed + " bytes");
+				/**
+				 * Logs every 10Mb
+				 */
+				if(((i+1) * MINI_CHUNK) % (MINI_CHUNK * 100) == 0) {
+					logger.info("Processed: " + bytesProcessed + " bytes");
+				}
 			}
 
 			outputByte = new byte[remainder];
@@ -125,7 +130,7 @@ public class FileController {
 			long noOfChunks = (file.length() / CHUNK) + 1;
 			long lastChunkSize = file.length() - (CHUNK * (noOfChunks - 1));
 			logger.info("File: " + fileName + " is greater then 2Gb and has " + noOfChunks
-					+ " no of chunks with the last chunk size of " + lastChunkSize + ", Fetching...");
+					+ " chunks of data with the last chunk size of " + lastChunkSize + ", Fetching...");
 			for (int i = 0; i < noOfChunks; i++) {
 				byte[] outputByte;
 				if (i == (noOfChunks - 1)) {
