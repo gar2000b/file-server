@@ -19,15 +19,102 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @EnableAutoConfiguration
 public class FileController {
 
+	private static final int MINI_CHUNK = 100000;
 	private static final int CHUNK = 2000000000;
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@RequestMapping("/file/{fileName:.+}")
 	public void download(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable("fileName") String fileName) {
+		try {
+			response.setContentType("application/octet-stream");
+			response.addHeader("Content-Disposition", "attachment; filename=" + fileName);
+
+			logger.info("Requesting file: " + fileName);
+
+			File file = new File("/files/" + fileName);
+			FileInputStream fileIn = new FileInputStream(file);
+			ServletOutputStream out = response.getOutputStream();
+
+			long noOfChunks = file.length() / MINI_CHUNK;
+			int remainder = (int) (file.length() - (noOfChunks * MINI_CHUNK));
+
+			byte[] outputByte = new byte[MINI_CHUNK];
+			long bytesProcessed = 0;
+
+			for (int i = 0; i < noOfChunks; i++) {
+				fileIn.read(outputByte, 0, MINI_CHUNK);
+				out.write(outputByte, 0, MINI_CHUNK);
+				outputByte = new byte[MINI_CHUNK];
+				bytesProcessed += MINI_CHUNK;
+				logger.info("Processed: " + bytesProcessed + " bytes");
+			}
+
+			outputByte = new byte[remainder];
+			fileIn.read(outputByte, 0, remainder);
+			out.write(outputByte, 0, remainder);
+			bytesProcessed += remainder;
+			logger.info("Processed: " + bytesProcessed + " bytes");
+
+			logger.info("File: " + fileName + " has been successfully sent over the wire");
+			fileIn.close();
+			out.close();
+		} catch (Throwable e) {
+			logger.error("Encountered an issue during processing: " + e.getMessage());
+		}
+	}
+
+	/**
+	 * Experimentation method
+	 * 
+	 * @param request
+	 * @param response
+	 * @param fileName
+	 */
+	@RequestMapping("/files/{fileName:.+}")
+	public void downloadFile(HttpServletRequest request, HttpServletResponse response,
+			@PathVariable("fileName") String fileName) {
+		try {
+			response.setContentType("application/octet-stream");
+			response.addHeader("Content-Disposition", "attachment; filename=" + fileName);
+
+			logger.info("Requesting file: " + fileName);
+
+			File file = new File("/files/" + fileName);
+			FileInputStream fileIn = new FileInputStream(file);
+			ServletOutputStream out = response.getOutputStream();
+
+			byte[] outputByte = new byte[MINI_CHUNK];
+			long bytesProcessed = 0;
+			while (fileIn.read(outputByte, 0, MINI_CHUNK) != -1) {
+				out.write(outputByte, 0, MINI_CHUNK);
+				outputByte = new byte[MINI_CHUNK];
+				bytesProcessed += MINI_CHUNK;
+				logger.info("Processed: " + bytesProcessed + " bytes");
+			}
+
+			logger.info("File: " + fileName + " has been successfully sent over the wire");
+			fileIn.close();
+			out.close();
+		} catch (Throwable e) {
+			logger.error("Encountered an issue during processing: " + e.getMessage());
+		}
+	}
+
+	/**
+	 * Experimentation method
+	 * 
+	 * @param request
+	 * @param response
+	 * @param fileName
+	 * @throws IOException
+	 */
+	@RequestMapping("/f/{fileName:.+}")
+	public void downloadF(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable("fileName") String fileName) throws IOException {
 		response.setContentType("application/octet-stream");
 		response.addHeader("Content-Disposition", "attachment; filename=" + fileName);
-		
+
 		logger.info("Requesting file: " + fileName);
 
 		File file = new File("/files/" + fileName);
@@ -37,7 +124,8 @@ public class FileController {
 		if (file.length() > CHUNK) {
 			long noOfChunks = (file.length() / CHUNK) + 1;
 			long lastChunkSize = file.length() - (CHUNK * (noOfChunks - 1));
-			logger.info("File: " + fileName + " is greater then 2Gb and has " + noOfChunks + " no of chunks with the last chunk size of " + lastChunkSize + ", Fetching...");
+			logger.info("File: " + fileName + " is greater then 2Gb and has " + noOfChunks
+					+ " no of chunks with the last chunk size of " + lastChunkSize + ", Fetching...");
 			for (int i = 0; i < noOfChunks; i++) {
 				byte[] outputByte;
 				if (i == (noOfChunks - 1)) {
@@ -60,7 +148,7 @@ public class FileController {
 			}
 		}
 
-		logger.info("File: " + fileName +  " has been successfully sent over the wire");
+		logger.info("File: " + fileName + " has been successfully sent over the wire");
 		fileIn.close();
 		out.close();
 	}
