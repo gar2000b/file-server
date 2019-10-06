@@ -23,6 +23,24 @@ public class FileController {
 	private static final int CHUNK = 2000000000;
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+	public static void main(String[] args) {
+		long noOfChunks = 3591957780l / MINI_CHUNK;
+		int remainder = (int) (3591957780l - (noOfChunks * MINI_CHUNK));
+		System.out.println(noOfChunks);
+		System.out.println(remainder);
+		long bytesProcessed = 0;
+		for (int i = 0; i < noOfChunks; i++) {
+			// System.out.println("p = " + ((i + 1) * MINI_CHUNK) % (MINI_CHUNK * 100));
+			if (((i + 1l) * MINI_CHUNK) % (MINI_CHUNK * 100) == 0) {
+				bytesProcessed += MINI_CHUNK;
+				System.out.println("Processed: " + bytesProcessed + " bytes. i = " + i);
+			}
+		}
+//		System.out.println("t1 = " + ((21499l + 1) * MINI_CHUNK));
+//		System.out.println("t2 = " + (MINI_CHUNK * 100));
+//		System.out.println("testing = " + (((21499l + 1) * MINI_CHUNK) % (MINI_CHUNK * 100)));
+	}
+
 	@RequestMapping("/file/{fileName:.+}")
 	public void download(HttpServletRequest request, HttpServletResponse response,
 			@PathVariable("fileName") String fileName) {
@@ -38,6 +56,8 @@ public class FileController {
 
 			long noOfChunks = file.length() / MINI_CHUNK;
 			int remainder = (int) (file.length() - (noOfChunks * MINI_CHUNK));
+			logger.info("noOfChunks: " + noOfChunks);
+			logger.info("remainder: " + remainder + " bytes");
 
 			byte[] outputByte = new byte[MINI_CHUNK];
 			long bytesProcessed = 0;
@@ -50,11 +70,12 @@ public class FileController {
 				/**
 				 * Logs every 10Mb
 				 */
-				if(((i+1) * MINI_CHUNK) % (MINI_CHUNK * 100) == 0) {
+				if (((i + 1l) * MINI_CHUNK) % (MINI_CHUNK * 100) == 0) {
 					logger.info("Processed: " + bytesProcessed + " bytes");
 				}
 			}
 
+			logger.info("Processing remainder: " + remainder + " bytes");
 			outputByte = new byte[remainder];
 			fileIn.read(outputByte, 0, remainder);
 			out.write(outputByte, 0, remainder);
