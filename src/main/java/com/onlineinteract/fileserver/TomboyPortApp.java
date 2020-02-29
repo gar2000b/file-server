@@ -19,6 +19,9 @@ import org.xml.sax.SAXException;
  * Once the files have been placed together into a single directory, copy these over to the Tomdroid directory:
  * This PC\Galaxy Note4\Phone\tomdroid - then sync notes on Tomdroid app.
  * 
+ * ([A-Za-z0-9]+-{1})+[A-Za-z0-9]+ : regex to find the id portion of: 
+ * <note id="779dff95-06c4-411c-a43c-44b7e0e10393" rev="0" />
+ * 
  * @author gar20
  *
  */
