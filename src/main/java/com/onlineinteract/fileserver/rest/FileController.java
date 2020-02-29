@@ -15,6 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.onlineinteract.fileserver.FileServerApplication;
+
 @Controller
 @EnableAutoConfiguration
 public class FileController {
@@ -50,7 +52,7 @@ public class FileController {
 
 			logger.info("Requesting file: " + fileName);
 
-			File file = new File("/files/" + fileName);
+			File file = new File(FileServerApplication.FILE_PATH + fileName);
 			FileInputStream fileIn = new FileInputStream(file);
 			ServletOutputStream out = response.getOutputStream();
 
@@ -106,7 +108,7 @@ public class FileController {
 
 			logger.info("Requesting file: " + fileName);
 
-			File file = new File("/files/" + fileName);
+			File file = new File(FileServerApplication.FILE_PATH + fileName);
 			FileInputStream fileIn = new FileInputStream(file);
 			ServletOutputStream out = response.getOutputStream();
 
@@ -143,7 +145,7 @@ public class FileController {
 
 		logger.info("Requesting file: " + fileName);
 
-		File file = new File("/files/" + fileName);
+		File file = new File(FileServerApplication.FILE_PATH + fileName);
 		FileInputStream fileIn = new FileInputStream(file);
 		ServletOutputStream out = response.getOutputStream();
 
