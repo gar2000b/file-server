@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class FileServerApplication {
-
 	public static String FILE_PATH = "/files/";
 
 	public static void main(String[] args) {

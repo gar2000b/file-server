@@ -12,6 +12,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
 /**
+ * Note: ensure the DESTINATION PATH (currently set to desktop/notes) exists.
+ * 
  * TomboyPort app seeks to port over all current notes from Tomboy (1.15.9) to Tomdroid (0.7.5) by simply
  * iterating through each file based on main manifest file. If there are duplicates, then those are overridden 
  * with the latest versions.
@@ -29,7 +31,8 @@ public class TomboyPortApp {
 	private static final String MANIFEST_FILENAME = "manifest.xml";
 	private static final String SPLIT = "\"";
 	private static final String NOTE_IDENTIFIER = "note id";
-	private static final int DIRECTORY_MARKER = 100;
+	private static final int DIRECTORY_MARKER_100 = 100;
+	private static final int DIRECTORY_MARKER_1000 = 1000;
 	private static final int DIRECTORY_POSITION = 0;
 	private static final int SUB_DIRECTORY_POSITION = 3;
 	private static final int FILENAME_POSITION = 1;
@@ -50,11 +53,13 @@ public class TomboyPortApp {
 				.map(x -> x.split(SPLIT))
 				.collect(Collectors.toList());
 
-		char directory = '0';
+		String directory = "0";
 		for (String[] values : notes) {
 			System.out.println(values[FILENAME_POSITION] + " " + values[SUB_DIRECTORY_POSITION]);
-			if (Integer.valueOf(values[SUB_DIRECTORY_POSITION]) >= DIRECTORY_MARKER)
-				directory = values[SUB_DIRECTORY_POSITION].charAt(DIRECTORY_POSITION);
+			if (Integer.valueOf(values[SUB_DIRECTORY_POSITION]) >= DIRECTORY_MARKER_1000)
+				directory = values[SUB_DIRECTORY_POSITION].charAt(DIRECTORY_POSITION) + "0";
+			else if (Integer.valueOf(values[SUB_DIRECTORY_POSITION]) >= DIRECTORY_MARKER_100)
+				directory = String.valueOf(values[SUB_DIRECTORY_POSITION].charAt(DIRECTORY_POSITION));
 			copyFile(directory, values[SUB_DIRECTORY_POSITION], values[FILENAME_POSITION] + NOTE_EXTENSION);
 			// processFile(DESTINATION_PATH + SEPERATOR + values[FILENAME_POSITION] + NOTE_EXTENSION);
 		}
@@ -86,7 +91,7 @@ public class TomboyPortApp {
 	 * }
 	 */
 	
-	public void copyFile(char directory, String subDirectory, String filename) {
+	public void copyFile(String directory, String subDirectory, String filename) {
 		try {
 			File f = new File(Paths.get(DESTINATION_PATH + SEPERATOR + filename).toString());
 			if(f.exists())
